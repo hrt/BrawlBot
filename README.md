@@ -1,5 +1,5 @@
 # HattoriBot
-A quick hack made for brawlhalla that plays hattori. It has a lot to improve on but I'm losing interest.
+A quick hack made for brawlhalla that plays Hattori. It's can be improved a lot more however I'm losing interest.
 
 Written for Python 2
 
