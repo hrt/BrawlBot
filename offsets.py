@@ -1,6 +1,7 @@
 PROCESS_NAME = 'Brawlhalla.exe'
 # these two could be aob scanned but the pointers are not hard to find
 # search for double 568.99 on demon map - it is your standing y
+# ginput is just 0 ORed with whatever button you have pressed for example if you have up pressed then it'll be 17
 g_input_base_offset = 0x34 # add to the base of ginput
 g_input_offsets = ('Adobe AIR.dll', [0x0131550C, 0x1DC, 0x18, 0x8, 0x98, 0x1F8, 0x4CC])
 local_ptr_offsets = ('Adobe AIR.dll', [0x01315528, 0xA4, 0x44C, 0x14, 0x98, 0x98, 0x548])

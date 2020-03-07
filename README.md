@@ -13,6 +13,10 @@ pip install requirments
 ```
 
 # usage
+First adjust `calculate_actual_input` in `play.py` to match your ingame settings.
+
+
+You'll probably need to update `g_input_offsets` and `local_ptr_offsets` in `offsets.py`
 ```
 python play.py
 ```
