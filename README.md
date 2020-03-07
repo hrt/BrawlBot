@@ -6,7 +6,7 @@ Written for Python 2
 [![Alt text](https://img.youtube.com/vi/CIVxv4JUefs/0.jpg)](https://www.youtube.com/watch?v=CIVxv4JUefs)
 
 
-# install
+# install requirments
 ```
 pip install https://github.com/hrt/memorpy/archive/master.zip
 pip install requirments
