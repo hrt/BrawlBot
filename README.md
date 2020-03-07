@@ -3,7 +3,7 @@ A quick hack made for brawlhalla that plays hattori.
 
 Written for Python 2
 
-[![Alt text](https://img.youtube.com/vi/RPr5pDSZ7gE/0.jpg)](https://www.youtube.com/watch?v=RPr5pDSZ7gE)
+[![Alt text](https://img.youtube.com/vi/CIVxv4JUefs/0.jpg)](https://www.youtube.com/watch?v=CIVxv4JUefs)
 
 
 # install
