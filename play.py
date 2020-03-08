@@ -54,7 +54,15 @@ def main():
             g_input.write(target_direction)
             reset_input(g_input)
         g_input.write(HEAVY_ATTACK)
-        reset_input(g_input)
+
+    def side_heavy(local, target):
+        target_direction = LEFT if local.x-target.x > 0 else RIGHT
+        g_input.write(HEAVY_ATTACK | target_direction)
+
+
+    def down_heavy(local, target):
+        target_direction = LEFT if local.x-target.x > 0 else RIGHT
+        g_input.write(HEAVY_ATTACK | DOWN | target_direction)
 
     def neutral_quick(local, target):
         target_direction = LEFT if local.x-target.x > 0 else RIGHT
@@ -62,7 +70,6 @@ def main():
             g_input.write(target_direction)
             reset_input(g_input)
         g_input.write(QUICK_ATTACK)
-        reset_input(g_input)
 
     def side_air_quick(local, target, u=UP):
         target_direction = LEFT if local.x-target.x > 0 else RIGHT
@@ -79,7 +86,6 @@ def main():
         print('gravity cancel')
         g_input.write(DODGE)
         reset_input(g_input)
-        time.sleep(0.1)
 
     print('Entering script mode')
     while True:
@@ -91,10 +97,10 @@ def main():
         for target in targets:
             dx = target.x-local.x
             dy = target.y-local.y
-            if target.can_dodge and target.in_attack and abs(dx+target.x_vel-local.x_vel) < 200 and abs(dy+target.y_vel-local.y_vel) < 200 and local.can_dodge:
+            if  target.in_attack and abs(dx+target.x_vel-local.x_vel) < 300 and abs(dy+target.y_vel-local.y_vel) < 300 and local.can_dodge:
                 print('phase dodge')
                 if local.not_grounded:
-                    g_input.write(DODGE | calculate_actual_input())
+                    g_input.write(DODGE | current_input)
                 else:
                     g_input.write(DODGE)
                 time.sleep(0.05)
@@ -146,29 +152,40 @@ def main():
 
 
             if local.weapon == SPEAR:
-                if 100 < dy < 350 and 600 > abs(dx) > 100 and target.damage_taken > 180:
-                    print('spear finish')
-                    if local.not_grounded and local.can_dodge:
-                        gravity_cancel()
-                        neutral_heavy(local, target)
-                        break
-                    elif not local.not_grounded:
-                        neutral_heavy(local, target)
-
-                if 100 < dy < 350 and 350 > abs(dx) > 100:
-                    print('down quick')
-                    if local.not_grounded and local.can_dodge:
-                        gravity_cancel()
+                if 100 < dy < 350 and 300 > abs(dx) > 100:
+                    if not local.not_grounded:
+                        print('down quick')
                         down_quick(local, target)
                         reset_input(g_input)
                         break
-                    elif not local.not_grounded:
-                        down_quick(local, target)
+
+
+                if 100 < dy < 450 and 400 > abs(dx) > 50:
+                    if not local.not_grounded and target.damage_taken > 180:
+                        print('finish')
+                        neutral_heavy(local, target)
+                        reset_input(g_input)
+                        break
+                    elif local.not_grounded and local.can_dodge and local.jump_count < 2:
+                        gravity_cancel()
+                        neutral_heavy(local, target)
+                        reset_input(g_input)
+                        break
+
+                if -100 < dy < 0 and 300 < abs(dx)  and abs(dx) < 600:
+                    if not local.not_grounded:
+                        down_heavy(local, target)
+                        reset_input(g_input)
+                        break
+
+                    if local.not_grounded and local.can_dodge and local.jump_count < 2:
+                        gravity_cancel()
+                        down_heavy(local, target)
                         reset_input(g_input)
                         break
 
                 # spear air side quick
-                if 200 < dy < 400 and 400 > abs(dx) > 100 and local.not_grounded:
+                if 200 < dy < 400 and 400 > abs(dx) > 100 and local.not_grounded and local.jump_count < 2:
                     print('air side quick')
                     # can be better with jump count (can jump)
                     side_air_quick(local, target)
@@ -176,7 +193,7 @@ def main():
                     break
 
                 # spear air quick
-                if abs(dy) < 200 and 200 > abs(dx) and local.not_grounded:
+                if abs(dy) < 300 and 300 > abs(dx) and local.not_grounded:
                     print('air quick')
                     # can be better with jump count (can jump)
                     air_quick(local, target)
@@ -187,6 +204,63 @@ def main():
                 if (abs(dy) < 150) and (100 < abs(dx) < 600) and not local.not_grounded:
                     print('side quick')
                     side_quick(local, target)
+                    reset_input(g_input)
+                    break
+
+            if local.weapon == KATAR:
+                # if 50 < dy < 350 and 300 > abs(dx) > 100:
+                if 400 > dy > 50 and (50 < abs(dx) < 400) and target.in_stun:
+                    if not local.not_grounded:
+                        print('down quick')
+                        down_quick(local, target)
+                        reset_input(g_input)
+                        break
+
+                if -600 < dy < -50 and 200 < abs(dx) < 500 and local.not_grounded and local.jump_count < 2:
+                    print('air down quick')
+                    down_quick(local,  target)
+                    reset_input(g_input)
+                    break
+
+                if 600 < dy < 50 and 200 < abs(dx) < 500 and local.not_grounded and local.jump_count < 2:
+                    print('air side heavy')
+                    side_heavy(local,  target)
+                    reset_input(g_input)
+                    break
+
+                if 300 > dy > 100 and (abs(dx) < 400) and target.in_stun:
+                    print('end him')
+                    if local.not_grounded and local.can_dodge and local.jump_count < 2:
+                        gravity_cancel()
+                        neutral_heavy(local, target)
+                        reset_input(g_input)
+                        break
+                    elif not local.not_grounded:
+                        neutral_heavy(local, target)
+                        reset_input(g_input)
+
+                if (abs(dy) < 100) and (20 < abs(dx) < 300) and not local.not_grounded and target.in_stun:
+                    print('nquick')
+                    neutral_quick(local, target)
+                    reset_input(g_input)
+                    break
+
+                if (abs(dy) < 100) and (50 < abs(dx) < 400) and not local.not_grounded:
+                    print('side quick')
+                    side_quick(local, target)
+                    reset_input(g_input)
+                    break
+
+                if abs(dy) < 300 and 300 > abs(dx) > 50 and local.not_grounded:
+                    print('air quick')
+                    air_quick(local, target)
+                    reset_input(g_input)
+                    break
+
+                if 200 < dy < 400 and 400 > abs(dx) > 100 and local.not_grounded and local.jump_count < 2:
+                    print('air side quick')
+                    # can be better with jump count (can jump)
+                    side_air_quick(local, target)
                     reset_input(g_input)
                     break
 
@@ -253,7 +327,7 @@ def main():
                     break
 
 
-            if (target.in_animation and not target.in_stun) and abs(dx+target.x_vel-local.x_vel) < 400 and abs(dy+target.y_vel-local.y_vel) < 400 and local.jump_count < 2:
+            if (target.in_animation and not target.in_stun) and abs(dx+target.x_vel-local.x_vel) < 400 and abs(dy+target.y_vel-local.y_vel) < 400 and local.jump_count < 1:
                 print('jump dodge')
                 if current_input & UP:
                     reset_input(g_input, u=UP)

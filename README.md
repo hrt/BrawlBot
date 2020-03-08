@@ -1,5 +1,7 @@
-# HattoriBot
+# BrawlBot
 A quick hack made for brawlhalla that plays Hattori. It's can be improved a lot more however I'm losing interest.
+
+Current implementation is for Queen Nai
 
 Written for Python 2
 
