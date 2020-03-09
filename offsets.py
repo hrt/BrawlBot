@@ -1,13 +1,19 @@
 PROCESS_NAME = 'Brawlhalla.exe'
-# these two could be aob scanned but the pointers are not hard to find
 # search for double 568.99 on demon map - it is your standing y
 # ginput is just 0 ORed with whatever button you have pressed for example if you have up pressed then it'll be 17
+
+entity_sig_1 = b"\x00\x90\x64......\xA0.......\x00" # base entity -1
+entity_sig_2 = b"\x00.\x64..............\x00" # a looser variant
+# 90 AD 83 04 10 EF 57 13 50 78 68 07 90 64 C2 62
+# 90 AD 57 04 40 32 2C 12 50 58 46 07 90 64 C2 62
+# 90 AD E0 03 10 7F 9B 12 50 B8 B3 06 90 64 C2 62
+# 90 AD BC 03 10 FF 84 12 50 88 97 06 90 64 C2 62
+# 90 AD 2F 04 10 0F F3 12 50 78 17 07 90 64 C2 62
+# 90 AD EE 03 10 9F 8C 12 50 88 AA 06 90 64 A3 62
+ginput_sig = b"\x90\xAD......\x50...\x90\x64.\x62"
 g_input_base_offset = 0x34 # add to the base of ginput
 g_input_offsets = ('Adobe AIR.dll', [0x0131550C, 0x1DC, 0x18, 0x8, 0x98, 0x1F8, 0x4CC])
 local_ptr_offsets = ('Adobe AIR.dll', [0x01315528, 0xA4, 0x44C, 0x14, 0x98, 0x98, 0x548])
-
-aob_sig_1 = b"\x00\x90\x64......\xA0.......\x00" # base entity -1
-aob_sig_2 = b"\x00.\x64..............\x00" # a looser variant
 
 # below are relative to base of entity
 increased_gravity_offset = 0xC4 # 1 if sprinting down

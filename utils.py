@@ -18,14 +18,16 @@ def is_base_of_entity(mem, address):
     else:
         return True
 
-def aob_scan(mem, entity_pointers, last_start, last_size, pattern=None, offset=1):
-    all_the_bytes = mem.process.read(mem.Address(last_start), type='bytes', maxlen=last_size)
-    matches = re.finditer(pattern if pattern else aob_sig_1, all_the_bytes)
+def aob_scan(mem, entity_pointers, start, size, pattern=None, offset=0, entity_check=False):
+    all_the_bytes = mem.process.read(mem.Address(start), type='bytes', maxlen=size)
+    matches = re.finditer(pattern, all_the_bytes)
     for match in matches:
         span = match.span()
         if span:
-            address = last_start + span[0] + offset
-            if address not in entity_pointers and is_base_of_entity(mem, address):
+            address = start + span[0] + offset
+            if not entity_check:
+                entity_pointers.append(address)
+            elif address not in entity_pointers and is_base_of_entity(mem, address):
                     entity_pointers.append(address)
 
 def dereference_offsets(mem, name_and_offsets):
@@ -36,33 +38,36 @@ def dereference_offsets(mem, name_and_offsets):
         ptr = mem.process.read(mem.Address(ptr + offset))
     return ptr
 
-def probe_entities(mem, local_ptr):
+def entities_aob_scan(mem):
     print('Scanning memory for entities')
     modules = mem.process.list_modules()
     regions = mem.process.iter_region(start_offset=modules[PROCESS_NAME], protec=PAGE_READWRITE)
     entity_pointers = []
-    starts = []
-    sizes = []
-    print("Performing quick scan")
+    print("Performing deep scan")
     for start, size in regions:
         if len(entity_pointers) >= 4:
             break
-        starts.append(start)        
-        sizes.append(size)        
-        if start < local_ptr:
-            continue
-        aob_scan(mem, entity_pointers, starts[-10], sizes[-10])
-
-    print('Found %d entities : %s' % (len(entity_pointers), ', '.join([hex(e) for e in entity_pointers])))
-
-    print("Performing deep scan")
-    for start, size in zip(starts,sizes):
-        if len(entity_pointers) >= 4:
-            break
-        aob_scan(mem, entity_pointers, start, size, pattern=aob_sig_2)
+        aob_scan(mem, entity_pointers, start, size, pattern=entity_sig_2, offset=1, entity_check=True)
 
     print('Found %d entities : %s' % (len(entity_pointers), ', '.join([hex(e) for e in entity_pointers])))
     return entity_pointers
+
+def ginput_aob_scan(mem):
+    print('Scanning memory for ginput')
+    modules = mem.process.list_modules()
+    regions = mem.process.iter_region(start_offset=modules[PROCESS_NAME], protec=PAGE_READWRITE)
+    ginput_pointers = []
+    print("Performing deep scan")
+    for start, size in regions:
+        if len(ginput_pointers) >= 1:
+            break
+        aob_scan(mem, ginput_pointers, start, size, pattern=ginput_sig, offset=-16)
+
+    print('Found %d ginput : %s' % (len(ginput_pointers), ', '.join([hex(e) for e in ginput_pointers])))
+    assert len(ginput_pointers) == 1, "invalid number of ginput pointers found, find a better sig"
+    ginput_pointer = ginput_pointers[0]
+    print('g_input: %s' % hex(ginput_pointer))
+    return ginput_pointers[0]
 
 def fetch_entity(mem, address):
     x = mem.Address(address + x_offset).read(type='double')
