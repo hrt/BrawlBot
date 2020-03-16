@@ -1,7 +1,5 @@
 # BrawlBot
-A quick hack made for brawlhalla that plays Queen Nai (at the moment). It's can be improved a lot more however I'm losing interest.
-
-Current implementation is for Queen Nai
+A quick hack made for brawlhalla that plays Queen Nai (at the moment). It can be improved a lot more however I'm losing interest.
 
 Written for Python 2
 
