@@ -9,7 +9,6 @@ Written for Python 2
 # install requirments
 ```
 pip install https://github.com/hrt/memorpy/archive/master.zip
-pip install requirments
 ```
 
 # usage
